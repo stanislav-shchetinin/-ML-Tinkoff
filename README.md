@@ -1,1 +1,1 @@
-# ML Tinkoff
+# Отбор на курсы ML Tinkoff
