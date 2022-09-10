@@ -17,7 +17,7 @@ length_sequence = args.length
 input = open(name_model_dir, 'rb')
 model = pickle.load(input)
 
-print(prefix_sequence, end="")
+print(prefix_sequence, end=" ")
 length_sequence -= 2
 current_pair = prefix_sequence.split(" ")
 current_pair = tuple(current_pair)
@@ -26,9 +26,18 @@ current_pair = tuple(current_pair)
 
 for _ in range(length_sequence):
     if model.get(current_pair) == None:
-        print(" а", end="")
-        current_pair = (current_pair[1], "а")
+        print("и", end=" ") #и - самое популярное слово
+        current_pair = (current_pair[1], "и")
     else:
-        print( " " + model[current_pair][0], end="" )
-        current_pair = (current_pair[1], model[current_pair][0])
+        words = list()
+        prob = list()
+
+        for pair in model[current_pair]:
+            words.append(pair[0])
+            prob.append(pair[1])
+
+
+        choice_word = numpy.random.choice(words, 1, prob)
+        print(choice_word[0], end = " ")
+        current_pair = (current_pair[1], choice_word[0])
 
