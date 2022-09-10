@@ -28,22 +28,32 @@ content_all_texts = content_all_texts.lower()
 arr_words = re.split("[^a-zа-яё]+", content_all_texts)
 
 #создание словаря (слово префикса 1, слово префикса 2, следующее слова) : (кол-во встреч)
-dictionary = dict()
+dict_trip = dict()
+#создание словаря (слово префикса 1, слово префикса 2) : (кол-во встреч)
+dict_dbl = dict()
 for ind in range(len(arr_words) - 2):
-    count_dict = dictionary.get((arr_words[ind], arr_words[ind + 1], arr_words[ind + 2]), 0)
-    count_dict += 1
-    dictionary[ (arr_words[ind], arr_words[ind + 1], arr_words[ind + 2]) ] = count_dict
+    count_dict_trip = dict_trip.get((arr_words[ind], arr_words[ind + 1], arr_words[ind + 2]), 0)
+    count_dict_dbl = dict_dbl.get( (arr_words[ind], arr_words[ind + 1]), 0 )
+    count_dict_trip += 1
+    count_dict_dbl += 1
+    dict_trip[ (arr_words[ind], arr_words[ind + 1], arr_words[ind + 2]) ] = count_dict_trip
+    dict_dbl[( arr_words[ind], arr_words[ind + 1] )] = count_dict_dbl
 
-#создание словаря (слово префикса 1, слово префикса 2) : (следующее слово {встречается макс. раз для пары}, сколько встречается)
+#создание словаря (слово префикса 1, слово префикса 2) : [(следующее слово, вероятность встречи), ...]
 model = dict()
-for triple in dictionary:
-    count_word = dictionary[triple]
-    if model.get(triple[:2]) == None:
-        model[triple[:2]] = (triple[2], count_word)
+for triple in dict_trip:
+    count_word = dict_trip[triple]
+    count_prefix = dict_dbl[triple[:2]]
+
+    if triple[:2] in model:
+        model[triple[:2]].append( ( triple[2], count_word/count_prefix ) )
     else:
-        word, count_mod = model[ triple[:2] ]
-        if count_mod < count_word:
-            model[triple[:2]] = (triple[2], count_word)
+        model[triple[:2]] = list()
+        model[triple[:2]].append((triple[2], count_word / count_prefix))
+
+# for pr in model:
+#     print(pr, end = ": ")
+#     print(model[pr])
 
 #импорт pickle
 output = open(name_model_dir, 'wb')
